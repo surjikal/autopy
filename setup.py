@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+
+from __future__ import print_function
+
 import os
 import platform
 import sys
 import textwrap
 
 from distutils.core import setup, Extension
-from commands import getoutput
+try:
+    from subprocess import getoutput
+except ImportError:
+    from commands import getoutput
 
 # Determine platform being used.
 system = platform.system()
@@ -47,7 +53,7 @@ def create_package_dir(package_name, docstring, module_names):
         f.close()
 
     if update_file:
-        print 'Updating __init__.py'
+        print('Updating __init__.py')
         f = open(init_path, 'w')
         f.write(file_contents)
         f.close()
@@ -213,9 +219,9 @@ def create_ext_modules(src_dir):
                                      extra_link_args=extra_link_args))
     return ext_modules
 
-PACKAGE_NAME = 'autopy'
+PACKAGE_NAME = 'autopy3'
 PACKAGE_DESCRIPTION = \
-'''AutoPy is a simple, cross-platform GUI automation toolkit for Python. It
+'''AutoPy is a simple, cross-platform GUI automation toolkit for Python 3. It
 includes functions for controlling the keyboard and mouse, finding colors
 and bitmaps on-screen, and displaying alerts -- all in a cross-platform,
 efficient, and simple manner.'''
@@ -228,10 +234,9 @@ create_package_dir(PACKAGE_NAME, PACKAGE_DESCRIPTION, modules_names)
 setup(name=PACKAGE_NAME,
       version='0.51',
       author='Michael Sanders',
-      author_email='michael+autopy [at] msanders [dot] com',
-      url='http://autopy.org',
+      url='https://github.com/Riamse/autopy3',
       license='MIT',
-      description='A simple, cross-platform GUI automation toolkit for Python.',
+      description='A simple, cross-platform GUI automation toolkit for Python 3.',
       long_description=PACKAGE_DESCRIPTION,
       platforms=('Mac OS X 10.5+', 'X11 with XTest Extension', 'Windows'),
       packages=[PACKAGE_NAME],
