@@ -1,6 +1,5 @@
 #include "autopy-screen-module.h"
 #include "screen.h"
-#include "screengrab.h"
 
 /* Syntax: get_size() => tuple (width, height) */
 /* Description: Returns a tuple `(width, height)` of the size of the
@@ -28,7 +27,6 @@ static PyObject *screen_point_visible(PyObject *self, PyObject *args);
                 only more efficient/convenient. */
 /* Raises: |ValueError| if the rect is out of bounds,
            |OSError| if the system calls were unsuccessful. */
-static PyObject *screen_get_color(PyObject *self, PyObject *args);
 
 static PyMethodDef ScreenMethods[] = {
 	{"get_size", screen_get_size, METH_NOARGS,
@@ -37,9 +35,6 @@ static PyMethodDef ScreenMethods[] = {
 	{"point_visible", screen_point_visible, METH_VARARGS,
 	 "point_visible(x, y) -> Boolean\n"
 	 "Returns whether given (x, y) coordinate is inside the main screen."},
-	{"get_color", screen_get_color, METH_VARARGS,
-	 "get_color(x, y) -> integer\n"
-	 "Returns hexadecimal value describing the RGB color at the given point."},
 	{NULL, NULL, 0, NULL} /* Sentinel */
 };
 
@@ -85,32 +80,4 @@ static PyObject *screen_point_visible(PyObject *self, PyObject *args)
 	}
 
 	Py_RETURN_TRUE;
-}
-
-static PyObject *screen_get_color(PyObject *self, PyObject *args)
-{
-	MMPoint point;
-
-	MMBitmapRef bitmap;
-	MMRGBHex color;
-
-	if (!PyArg_ParseTuple(args, "kk", &point.x, &point.y)) {
-		return NULL;
-	}
-
-	if (!pointVisibleOnMainDisplay(point)) {
-		PyErr_SetString(PyExc_ValueError, "Point out of bounds");
-		return NULL;
-	}
-
-	bitmap = copyMMBitmapFromDisplayInRect(MMRectMake(point.x, point.y, 1, 1));
-	if (bitmap == NULL || bitmap->imageBuffer == NULL) {
-		PyErr_SetString(PyExc_OSError,
-		                "Could not copy RGB data from display.");
-		return NULL;
-	}
-
-	color = MMRGBHexAtPoint(bitmap, 0, 0);
-	destroyMMBitmap(bitmap);
-	return Py_BuildValue("I", color);
 }
